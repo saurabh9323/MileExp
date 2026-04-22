@@ -101,202 +101,114 @@ export default function CustomerTable() {
     <div className="flex flex-col min-h-screen" style={{ background: "var(--bg)" }}>
 
       {/* ═══════════════ NAVBAR ═══════════════ */}
-      <nav
-        className="sticky top-0 z-50"
-        style={{
-          background: "var(--bg2)",
-          borderBottom: "1px solid var(--border)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-        }}
-      >
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+   <nav
+  className="sticky top-0 z-50"
+  style={{
+    background: "rgba(13,13,26,0.85)",
+    backdropFilter: "blur(20px)",
+    borderBottom: "1px solid var(--border)",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.35)"
+  }}
+>
+  <div className="max-w-screen-xl mx-auto px-6">
+    <div className="flex items-center justify-between h-16">
 
-            {/* ── Brand ── */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: "linear-gradient(135deg, #e94560, #c73050)",
-                  boxShadow: "0 2px 12px rgba(233,69,96,0.35)",
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
-                  <path d="M12 36L24 12L36 36" stroke="#fff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                  <path d="M16 28L32 28" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <span className="text-t1 font-extrabold text-base tracking-tight">MileExp</span>
-              <span
-                className="hidden sm:inline text-t3 text-xs font-medium px-2.5 py-1 rounded-full"
-                style={{ border: "1px solid var(--border2)" }}
-              >
-                Banking Analytics
-              </span>
-            </div>
-
-            {/* ── Center Nav Links (desktop) ── */}
-            <div className="hidden md:flex items-center gap-0.5">
-              {NAV_LINKS.map((link, i) => (
-                <button
-                  key={link}
-                  className="px-3.5 py-2 text-sm font-medium rounded-r transition-all duration-150"
-                  style={
-                    i === 0
-                      ? { color: "var(--accent)", background: "var(--accent3)" }
-                      : { color: "var(--text2)" }
-                  }
-                  onMouseEnter={(e) => {
-                    if (i !== 0) {
-                      e.currentTarget.style.color = "var(--text)";
-                      e.currentTarget.style.background = "var(--bg3)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (i !== 0) {
-                      e.currentTarget.style.color = "var(--text2)";
-                      e.currentTarget.style.background = "transparent";
-                    }
-                  }}
-                >
-                  {link}
-                </button>
-              ))}
-            </div>
-
-            {/* ── Right section ── */}
-            <div className="flex items-center gap-2">
-
-              {/* Product chips — only large screens */}
-              <div className="hidden xl:flex items-center gap-1.5">
-                {products.map((p) => (
-                  <span
-                    key={p}
-                    className="text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap"
-                    style={{
-                      background: "var(--accent2)",
-                      color: "var(--accent)",
-                      border: "1px solid rgba(233,69,96,0.2)",
-                    }}
-                  >
-                    {p}
-                  </span>
-                ))}
-              </div>
-
-              {/* Theme toggle */}
-              <button
-                onClick={toggleTheme}
-                title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-                className="flex items-center justify-center w-9 h-9 rounded-r transition-all duration-150"
-                style={{
-                  background: "var(--bg3)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text2)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--accent)";
-                  e.currentTarget.style.color = "var(--accent)";
-                  e.currentTarget.style.background = "var(--accent3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border)";
-                  e.currentTarget.style.color = "var(--text2)";
-                  e.currentTarget.style.background = "var(--bg3)";
-                }}
-              >
-                <ThemeIcon theme={theme} />
-              </button>
-
-              {/* User avatar + info */}
-              <button
-                onClick={() => setShowProfile(true)}
-                className="flex items-center gap-2.5 rounded-r px-2 py-1.5 transition-all duration-150 ml-1"
-                style={{ borderLeft: "1px solid var(--border)" }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg3)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-              >
-                <img
-                  src={
-                    user?.photoURL ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || "U")}&background=e94560&color=fff&size=68`
-                  }
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full flex-shrink-0"
-                  style={{ border: "2px solid var(--accent)" }}
-                />
-                <div className="hidden sm:flex flex-col items-start leading-tight">
-                  <span className="text-t1 text-sm font-semibold">{user?.displayName || user?.email}</span>
-                  <span className="text-t3 text-xs">{user?.email}</span>
-                </div>
-              </button>
-
-              {/* Mobile hamburger */}
-              <button
-                className="flex md:hidden items-center justify-center w-9 h-9 rounded-r ml-1"
-                style={{
-                  background: "var(--bg3)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text2)",
-                }}
-                onClick={() => setMobileMenuOpen((o) => !o)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                  {mobileMenuOpen ? (
-                    <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
-                  ) : (
-                    <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
-                  )}
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* ── Mobile menu drawer ── */}
-          {mobileMenuOpen && (
-            <div
-              className="md:hidden py-3 border-t"
-              style={{ borderColor: "var(--border)" }}
-            >
-              {NAV_LINKS.map((link, i) => (
-                <button
-                  key={link}
-                  className="flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-r mb-0.5"
-                  style={
-                    i === 0
-                      ? { color: "var(--accent)", background: "var(--accent3)" }
-                      : { color: "var(--text2)" }
-                  }
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link}
-                </button>
-              ))}
-
-              {/* Products on mobile */}
-              {products.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 px-3 pt-3 pb-1 border-t mt-2" style={{ borderColor: "var(--border)" }}>
-                  {products.map((p) => (
-                    <span
-                      key={p}
-                      className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                      style={{
-                        background: "var(--accent2)",
-                        color: "var(--accent)",
-                        border: "1px solid rgba(233,69,96,0.2)",
-                      }}
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+      {/* LEFT ─ BRAND */}
+      <div className="flex items-center gap-4">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          style={{
+            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+            boxShadow: "0 6px 20px rgba(99,102,241,0.4)"
+          }}
+        >
+          <span className="text-white font-bold">M</span>
         </div>
-      </nav>
 
+        <div className="flex flex-col leading-tight">
+          <span className="font-bold text-sm text-t1">MileExp</span>
+          <span className="text-[11px] text-t3">Banking Analytics</span>
+        </div>
+      </div>
+
+      {/* CENTER ─ NAV LINKS */}
+      <div className="hidden md:flex items-center gap-2 bg-[var(--bg3)] px-2 py-1 rounded-full border border-[var(--border)]">
+
+        {NAV_LINKS.map((link, i) => {
+          const isActive = i === 0;
+
+          return (
+            <button
+              key={link}
+              className="px-4 py-1.5 text-sm rounded-full transition-all duration-200"
+              style={
+                isActive
+                  ? {
+                      background: "var(--accent)",
+                      color: "#fff",
+                      boxShadow: "0 4px 14px rgba(99,102,241,0.4)"
+                    }
+                  : {
+                      color: "var(--text2)"
+                    }
+              }
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "var(--bg4)";
+                  e.currentTarget.style.color = "var(--text)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "var(--text2)";
+                }
+              }}
+            >
+              {link}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* RIGHT SECTION */}
+      <div className="flex items-center gap-3">
+
+        {/* Search (NEW 🔥) */}
+        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border2)] bg-[var(--bg3)]">
+          <span className="text-xs text-t3">⌘K</span>
+          <input
+            placeholder="Search..."
+            className="bg-transparent outline-none text-sm w-32"
+          />
+        </div>
+
+        {/* Theme */}
+        <button
+          onClick={toggleTheme}
+          className="w-9 h-9 flex items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg3)] hover:bg-[var(--bg4)] transition"
+        >
+          <ThemeIcon theme={theme} />
+        </button>
+
+        {/* Avatar */}
+        <div
+          onClick={() => setShowProfile(true)}
+          className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-[var(--bg3)] cursor-pointer transition"
+        >
+          <img
+            src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.displayName}`}
+            className="w-8 h-8 rounded-full border-2 border-[var(--accent)]"
+          />
+          <span className="hidden sm:block text-sm text-t2 font-medium">
+            {user?.displayName}
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</nav>
       {/* ═══════════════ BODY ═══════════════ */}
       <div className="max-w-screen-xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex flex-col flex-1 pb-8">
 
