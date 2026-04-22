@@ -5,6 +5,7 @@ import "./App.css";
 
 export default function App() {
   const { user } = useAuth();
+  console.log("USER VALUE:", user);
 
   if (user === undefined) {
     return (

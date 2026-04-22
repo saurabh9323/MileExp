@@ -8,6 +8,17 @@ const Spinner = () => (
   </svg>
 );
 
+function Label({ label, children }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text2)", letterSpacing: "0.3px" }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 export default function Login() {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const [mode, setMode] = useState("signin");
@@ -65,227 +76,177 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "20px",
+      overflowY: "auto",
+      background: `linear-gradient(rgba(7,7,14,0.88), rgba(7,7,14,0.88)),
+        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=2070&q=80')
+        center/cover no-repeat fixed`,
+    }}>
 
-      {/* ── Background image ── */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=2070&q=80')",
-        }}
-      />
+      {/* Grid overlay */}
+      <div style={{
+        position: "fixed", inset: 0, pointerEvents: "none", opacity: 0.3,
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+        backgroundSize: "60px 60px",
+      }} />
 
-      {/* ── Dark overlay ── */}
-      <div className="absolute inset-0" style={{ background: "rgba(7,7,14,0.82)" }} />
+      {/* Accent glow top */}
+      <div style={{
+        position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)",
+        width: "800px", height: "400px", pointerEvents: "none",
+        background: "radial-gradient(ellipse at top, rgba(233,69,96,0.18) 0%, transparent 65%)",
+      }} />
 
-      {/* ── Grid pattern overlay ── */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-40"
-        style={{
-          backgroundImage: `linear-gradient(var(--border2) 1px, transparent 1px),
-                            linear-gradient(90deg, var(--border2) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      {/* ── Radial glow ── */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "30%", left: "50%", transform: "translate(-50%, -50%)",
-          width: "700px", height: "400px",
-          background: "radial-gradient(ellipse, rgba(233,69,96,0.18) 0%, transparent 70%)",
-          animation: "pulse-glow 4s ease-in-out infinite",
-        }}
-      />
-
-      {/* ── Bottom left decorative blobs ── */}
-      <div
-        className="absolute bottom-0 left-0 w-96 h-96 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse at bottom left, rgba(99,102,241,0.12) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* ── Card ── */}
-      <div
-        className="relative z-10 w-full max-w-[460px] rounded-3xl border"
-        style={{
-          background: "var(--card-bg)",
-          borderColor: "var(--border2)",
-          boxShadow: "0 0 0 1px var(--border), var(--shadow2), 0 0 80px rgba(233,69,96,0.08)",
-          animation: "fadeUp 0.5s cubic-bezier(.22,1,.36,1)",
-          padding: "52px 48px 44px",
-        }}
-      >
+      {/* Card */}
+      <div style={{
+        position: "relative", zIndex: 10,
+        width: "100%", maxWidth: "460px",
+        background: "linear-gradient(135deg, rgba(19,19,36,0.97), rgba(13,13,26,0.99))",
+        border: "1px solid rgba(255,255,255,0.10)",
+        borderRadius: "24px",
+        padding: "48px 44px 40px",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.7), 0 0 80px rgba(233,69,96,0.07)",
+        animation: "fadeUp 0.45s cubic-bezier(.22,1,.36,1)",
+      }}>
 
         {/* Brand */}
-        <div className="flex items-center gap-3 mb-8">
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{
-              background: "linear-gradient(135deg, #e94560, #c73050)",
-              boxShadow: "0 4px 16px rgba(233,69,96,0.4)",
-            }}
-          >
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
+          <div style={{
+            width: "44px", height: "44px", borderRadius: "12px", flexShrink: 0,
+            background: "linear-gradient(135deg, #e94560, #c73050)",
+            boxShadow: "0 4px 16px rgba(233,69,96,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
             <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
-              <path d="M12 36L24 12L36 36" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <path d="M16 28L32 28" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" />
+              <path d="M12 36L24 12L36 36" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              <path d="M16 28L32 28" stroke="#fff" strokeWidth="4.5" strokeLinecap="round"/>
             </svg>
           </div>
           <div>
-            <div className="text-t1 font-extrabold text-xl tracking-tight leading-none mb-0.5">MileExp</div>
-            <div className="text-t3 text-xs tracking-wide">Banking Analytics</div>
+            <div style={{ fontSize: "20px", fontWeight: 800, color: "#f0f0ff", letterSpacing: "-0.4px", lineHeight: 1 }}>MileExp</div>
+            <div style={{ fontSize: "11px", color: "#4a4a70", letterSpacing: "0.5px", marginTop: "3px" }}>Banking Analytics</div>
           </div>
         </div>
 
         {/* Mode tabs */}
-        <div
-          className="flex p-1 mb-6 rounded-r"
-          style={{ background: "var(--bg3)", border: "1px solid var(--border)" }}
-        >
+        <div style={{
+          display: "flex", background: "#131324",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: "10px", padding: "4px", marginBottom: "24px", gap: "4px",
+        }}>
           {[["signin", "Sign In"], ["signup", "Create Account"]].map(([val, lbl]) => (
-            <button
-              key={val}
-              onClick={() => { setMode(val); setError(""); }}
-              className="flex-1 py-2.5 px-4 rounded text-sm font-semibold transition-all duration-150"
-              style={
-                mode === val
-                  ? { background: "var(--accent)", color: "#fff" }
-                  : { color: "var(--text2)" }
-              }
-            >
+            <button key={val} onClick={() => { setMode(val); setError(""); }} style={{
+              flex: 1, padding: "10px 16px", borderRadius: "8px", border: "none",
+              fontSize: "13.5px", fontWeight: mode === val ? 700 : 500,
+              fontFamily: "inherit", cursor: "pointer", transition: "all 0.15s",
+              background: mode === val ? "#e94560" : "transparent",
+              color: mode === val ? "#fff" : "#8b8bb0",
+            }}>
               {lbl}
             </button>
           ))}
         </div>
 
         {/* Heading */}
-        <h1 className="text-t1 font-bold tracking-tight mb-2" style={{ fontSize: "28px", letterSpacing: "-0.6px" }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#f0f0ff", letterSpacing: "-0.6px", marginBottom: "8px", lineHeight: 1.2 }}>
           {mode === "signin" ? "Welcome back" : "Get started"}
         </h1>
-        <p className="text-t2 text-sm leading-relaxed mb-6">
-          {mode === "signin"
-            ? "Sign in to your banking analytics dashboard"
-            : "Create your MileExp account to get started"}
+        <p style={{ fontSize: "14px", color: "#8b8bb0", lineHeight: 1.6, marginBottom: "24px" }}>
+          {mode === "signin" ? "Sign in to your banking analytics dashboard" : "Create your MileExp account to get started"}
         </p>
 
         {/* Error */}
         {error && (
-          <div
-            className="text-clr-red text-sm rounded-r px-4 py-3 mb-4"
-            style={{ background: "rgba(244,63,94,0.10)", border: "1px solid rgba(244,63,94,0.30)" }}
-          >
+          <div style={{
+            background: "rgba(244,63,94,0.10)", border: "1px solid rgba(244,63,94,0.30)",
+            borderRadius: "8px", padding: "12px 16px",
+            fontSize: "13.5px", color: "#f43f5e", marginBottom: "16px",
+          }}>
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 mb-5">
-
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "20px" }}>
           {mode === "signup" && (
             <Label label="Full Name">
-              <input
-                type="text" name="name" placeholder="Aaron Perez"
-                value={form.name} onChange={handleChange}
-                required autoComplete="name"
-                className="themed-input"
-              />
+              <input type="text" name="name" placeholder="Aaron Perez"
+                value={form.name} onChange={handleChange} required autoComplete="name"
+                className="themed-input" />
             </Label>
           )}
-
           <Label label="Email">
-            <input
-              type="email" name="email" placeholder="you@example.com"
-              value={form.email} onChange={handleChange}
-              required autoComplete="email"
-              className="themed-input"
-            />
+            <input type="email" name="email" placeholder="you@example.com"
+              value={form.email} onChange={handleChange} required autoComplete="email"
+              className="themed-input" />
           </Label>
-
           <Label label="Password">
-            <input
-              type="password" name="password"
+            <input type="password" name="password"
               placeholder={mode === "signup" ? "At least 6 characters" : "••••••••"}
-              value={form.password} onChange={handleChange}
-              required autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              className="themed-input"
-            />
+              value={form.password} onChange={handleChange} required
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              className="themed-input" />
           </Label>
-
           {mode === "signup" && (
             <Label label="Confirm Password">
-              <input
-                type="password" name="confirm" placeholder="Re-enter password"
-                value={form.confirm} onChange={handleChange}
-                required autoComplete="new-password"
-                className="themed-input"
-              />
+              <input type="password" name="confirm" placeholder="Re-enter password"
+                value={form.confirm} onChange={handleChange} required autoComplete="new-password"
+                className="themed-input" />
             </Label>
           )}
 
-          <button
-            type="submit" disabled={loading}
-            className="flex items-center justify-center gap-2 w-full py-3 mt-1 text-white text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5"
-            style={{
-              borderRadius: "var(--r2)",
-              background: "linear-gradient(135deg, #e94560, #c73050)",
-              boxShadow: "0 4px 16px rgba(233,69,96,0.35)",
-              border: "none",
-            }}
-          >
+          <button type="submit" disabled={loading} style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+            width: "100%", padding: "13px 20px", marginTop: "4px",
+            background: "linear-gradient(135deg, #e94560, #c73050)",
+            border: "none", borderRadius: "12px",
+            color: "#fff", fontSize: "15px", fontWeight: 700, fontFamily: "inherit",
+            cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.6 : 1,
+            boxShadow: "0 4px 16px rgba(233,69,96,0.35)", transition: "all 0.2s",
+          }}>
             {loading && <Spinner />}
-            {loading
-              ? (mode === "signup" ? "Creating account…" : "Signing in…")
-              : (mode === "signup" ? "Create Account" : "Sign In")}
+            {loading ? (mode === "signup" ? "Creating account…" : "Signing in…") : (mode === "signup" ? "Create Account" : "Sign In")}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 my-1">
-          <div className="flex-1 h-px" style={{ background: "var(--border2)" }} />
-          <span className="text-t3 text-xs">or</span>
-          <div className="flex-1 h-px" style={{ background: "var(--border2)" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "4px 0 16px" }}>
+          <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.08)" }} />
+          <span style={{ fontSize: "12px", color: "#4a4a70" }}>or</span>
+          <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.08)" }} />
         </div>
 
         {/* Google */}
-        <button
-          onClick={handleGoogle} disabled={googleLoading}
-          className="flex items-center justify-center gap-2.5 w-full py-3 mt-4 mb-5 text-t1 text-sm font-semibold transition-all duration-200 disabled:opacity-50 hover:-translate-y-px"
-          style={{
-            background: "var(--bg3)",
-            border: "1px solid var(--border2)",
-            borderRadius: "var(--r2)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          {googleLoading ? (
-            <Spinner />
-          ) : (
+        <button onClick={handleGoogle} disabled={googleLoading} style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
+          width: "100%", padding: "12px 20px", marginBottom: "20px",
+          background: "#131324", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "12px",
+          color: "#f0f0ff", fontSize: "14px", fontWeight: 600, fontFamily: "inherit",
+          cursor: googleLoading ? "not-allowed" : "pointer", opacity: googleLoading ? 0.6 : 1,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.3)", transition: "all 0.2s",
+        }}>
+          {googleLoading ? <Spinner /> : (
             <svg viewBox="0 0 24 24" width="18" height="18">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
           )}
           {googleLoading ? "Connecting…" : "Continue with Google"}
         </button>
 
-        <p className="text-t3 text-xs text-center leading-relaxed">
+        <p style={{ fontSize: "12px", color: "#4a4a70", textAlign: "center", lineHeight: 1.6 }}>
           By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
-    </div>
-  );
-}
-
-function Label({ label, children }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold text-t2 tracking-wide">{label}</label>
-      {children}
     </div>
   );
 }

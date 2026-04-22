@@ -1,26 +1,235 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — Dark Theme (default)
+═══════════════════════════════════════════════ */
+:root {
+  /* Backgrounds */
+  --bg:   #07070e;
+  --bg2:  #0d0d1a;
+  --bg3:  #111122;
+  --bg4:  #1a1a2e;
 
-  body {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    transition: background 0.2s, color 0.2s;
-  }
+  /* Borders */
+  --border:  rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.11);
 
-  /* Remove root centering — components handle their own layout */
-  #root {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  /* Text */
+  --text:  #f0f0ff;
+  --text2: #8b8bb0;
+  --text3: #4a4a70;
+
+  /* Accent — crimson red */
+  --accent:  #e94560;
+  --accent2: rgba(233, 69, 96, 0.14);
+  --accent3: rgba(233, 69, 96, 0.10);
+
+  /* Semantic colours */
+  --green: #10b981;
+  --red:   #f43f5e;
+  --gold:  #f59e0b;
+
+  /* Aliases used in components */
+  --acc2: rgba(233, 69, 96, 0.12);
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg:   #f4f4f8;
+  --bg2:  #ffffff;
+  --bg3:  #f0f0f5;
+  --bg4:  #e8e8f0;
+
+  --border:  rgba(0, 0, 0, 0.08);
+  --border2: rgba(0, 0, 0, 0.12);
+
+  --text:  #0d0d1a;
+  --text2: #4a4a70;
+  --text3: #8b8bb0;
+
+  --accent:  #e94560;
+  --accent2: rgba(233, 69, 96, 0.10);
+  --accent3: rgba(233, 69, 96, 0.07);
+  --acc2:    rgba(233, 69, 96, 0.10);
+
+  --green: #059669;
+  --red:   #e11d48;
+  --gold:  #d97706;
+}
+
+/* ═══════════════════════════════════════════════
+   BASE RESET
+═══════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════
+   TAILWIND TEXT-COLOR UTILITIES (t1 / t2 / t3)
+═══════════════════════════════════════════════ */
+.text-t1 { color: var(--text);  }
+.text-t2 { color: var(--text2); }
+.text-t3 { color: var(--text3); }
+
+/* ═══════════════════════════════════════════════
+   BORDER-RADIUS UTILITIES
+═══════════════════════════════════════════════ */
+.rounded-r  { border-radius: 8px;  }
+.rounded-r2 { border-radius: 12px; }
+
+/* ═══════════════════════════════════════════════
+   THEMED INPUT
+═══════════════════════════════════════════════ */
+.themed-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: #0d0d1a;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.themed-input::placeholder {
+  color: var(--text3);
+}
+
+.themed-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.15);
+}
+
+[data-theme="light"] .themed-input {
+  background: #f8f8fc;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text);
+}
+
+[data-theme="light"] .themed-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.12);
+}
+
+/* ═══════════════════════════════════════════════
+   TIER PILL
+═══════════════════════════════════════════════ */
+.tier-pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════
+   TRANSACTION TYPE BADGES
+═══════════════════════════════════════════════ */
+.txn-buy {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+.txn-sell {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+}
+.txn-hold,
+.txn-short {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR  (webkit)
+═══════════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.20);
+}
+
+/* ═══════════════════════════════════════════════
+   FOCUS VISIBLE — accessibility ring
+═══════════════════════════════════════════════ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════
+   UTILITY — remove default button styles
+═══════════════════════════════════════════════ */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
 }
