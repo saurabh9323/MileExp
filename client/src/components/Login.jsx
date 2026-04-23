@@ -63,41 +63,41 @@ export default function Login() {
     }
   };
 
-  const handleGoogle = async () => {
-    setGoogleLoading(true);
+  // ✅ CRITICAL: No async/await before signInWithGoogle()
+  // Popup must be triggered synchronously from click event
+  // Any await before signInWithPopup causes browsers to block it
+  const handleGoogle = () => {
     setError("");
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      if (err.code !== "auth/popup-closed-by-user") setError(err.message);
-    } finally {
-      setGoogleLoading(false);
-    }
+    setGoogleLoading(true);
+    signInWithGoogle()
+      .then(() => {
+        // onAuthStateChanged in AuthContext handles the rest
+      })
+      .catch((err) => {
+        if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
+          setError(err.message);
+        }
+      })
+      .finally(() => {
+        setGoogleLoading(false);
+      });
   };
 
   return (
     <div style={{
-      position: "fixed",
-      inset: 0,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "20px",
-      overflowY: "auto",
+      position: "fixed", inset: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "20px", overflowY: "auto",
       background: `linear-gradient(rgba(7,7,14,0.88), rgba(7,7,14,0.88)),
         url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=2070&q=80')
         center/cover no-repeat fixed`,
     }}>
-
-      {/* Grid overlay */}
       <div style={{
         position: "fixed", inset: 0, pointerEvents: "none", opacity: 0.3,
         backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
                           linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
         backgroundSize: "60px 60px",
       }} />
-
-      {/* Accent glow top */}
       <div style={{
         position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)",
         width: "800px", height: "400px", pointerEvents: "none",
@@ -106,13 +106,11 @@ export default function Login() {
 
       {/* Card */}
       <div style={{
-        position: "relative", zIndex: 10,
-        width: "100%", maxWidth: "460px",
+        position: "relative", zIndex: 10, width: "100%", maxWidth: "460px",
         background: "linear-gradient(135deg, rgba(19,19,36,0.97), rgba(13,13,26,0.99))",
-        border: "1px solid rgba(255,255,255,0.10)",
-        borderRadius: "24px",
+        border: "1px solid rgba(255,255,255,0.10)", borderRadius: "24px",
         padding: "48px 44px 40px",
-        boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.7), 0 0 80px rgba(233,69,96,0.07)",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.7)",
         animation: "fadeUp 0.45s cubic-bezier(.22,1,.36,1)",
       }}>
 
@@ -154,7 +152,6 @@ export default function Login() {
           ))}
         </div>
 
-        {/* Heading */}
         <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#f0f0ff", letterSpacing: "-0.6px", marginBottom: "8px", lineHeight: 1.2 }}>
           {mode === "signin" ? "Welcome back" : "Get started"}
         </h1>
@@ -162,18 +159,15 @@ export default function Login() {
           {mode === "signin" ? "Sign in to your banking analytics dashboard" : "Create your MileExp account to get started"}
         </p>
 
-        {/* Error */}
         {error && (
           <div style={{
             background: "rgba(244,63,94,0.10)", border: "1px solid rgba(244,63,94,0.30)",
-            borderRadius: "8px", padding: "12px 16px",
-            fontSize: "13.5px", color: "#f43f5e", marginBottom: "16px",
+            borderRadius: "8px", padding: "12px 16px", fontSize: "13.5px", color: "#f43f5e", marginBottom: "16px",
           }}>
             {error}
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "20px" }}>
           {mode === "signup" && (
             <Label label="Full Name">
@@ -201,13 +195,12 @@ export default function Login() {
                 className="themed-input" />
             </Label>
           )}
-
           <button type="submit" disabled={loading} style={{
             display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
             width: "100%", padding: "13px 20px", marginTop: "4px",
             background: "linear-gradient(135deg, #e94560, #c73050)",
-            border: "none", borderRadius: "12px",
-            color: "#fff", fontSize: "15px", fontWeight: 700, fontFamily: "inherit",
+            border: "none", borderRadius: "12px", color: "#fff",
+            fontSize: "15px", fontWeight: 700, fontFamily: "inherit",
             cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.6 : 1,
             boxShadow: "0 4px 16px rgba(233,69,96,0.35)", transition: "all 0.2s",
           }}>
@@ -216,22 +209,25 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Divider */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "4px 0 16px" }}>
           <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.08)" }} />
           <span style={{ fontSize: "12px", color: "#4a4a70" }}>or</span>
           <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.08)" }} />
         </div>
 
-        {/* Google */}
-        <button onClick={handleGoogle} disabled={googleLoading} style={{
-          display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
-          width: "100%", padding: "12px 20px", marginBottom: "20px",
-          background: "#131324", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "12px",
-          color: "#f0f0ff", fontSize: "14px", fontWeight: 600, fontFamily: "inherit",
-          cursor: googleLoading ? "not-allowed" : "pointer", opacity: googleLoading ? 0.6 : 1,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.3)", transition: "all 0.2s",
-        }}>
+        {/* ✅ onClick is NOT async — calls handleGoogle directly */}
+        <button
+          onClick={handleGoogle}
+          disabled={googleLoading}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
+            width: "100%", padding: "12px 20px", marginBottom: "20px",
+            background: "#131324", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "12px",
+            color: "#f0f0ff", fontSize: "14px", fontWeight: 600, fontFamily: "inherit",
+            cursor: googleLoading ? "not-allowed" : "pointer", opacity: googleLoading ? 0.6 : 1,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.3)", transition: "all 0.2s",
+          }}
+        >
           {googleLoading ? <Spinner /> : (
             <svg viewBox="0 0 24 24" width="18" height="18">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
