@@ -6,8 +6,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
@@ -15,54 +13,24 @@ import { auth, googleProvider } from "../firebase";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // undefined = still loading, null = logged out, object = logged in
   const [user, setUser] = useState(undefined);
   const [jwtToken, setJwtToken] = useState(null);
 
   useEffect(() => {
-    let unsubscribe;
-
-    const init = async () => {
-      // ✅ CRITICAL: Wait for redirect result BEFORE subscribing to auth state
-      // This prevents the flicker where Firebase briefly sees no user
-      // and redirects back to login page
-      try {
-        const redirectResult = await getRedirectResult(auth);
-        if (redirectResult?.user) {
-          console.log("✅ Google redirect login:", redirectResult.user.email);
-        }
-      } catch (err) {
-        console.error("Redirect result error:", err.code);
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        const token = await u.getIdToken();
+        setJwtToken(token);
+        localStorage.setItem("mileexp_token", token);
+        setUser(u);
+      } else {
+        setJwtToken(null);
+        localStorage.removeItem("mileexp_token");
+        setUser(null);
       }
-
-      // Now subscribe to auth state — redirect result is already processed
-      unsubscribe = onAuthStateChanged(auth, async (u) => {
-        if (u) {
-          const token = await u.getIdToken();
-          setJwtToken(token);
-          localStorage.setItem("mileexp_token", token);
-          setUser(u);
-        } else {
-          setJwtToken(null);
-          localStorage.removeItem("mileexp_token");
-          setUser(null);
-        }
-      });
-    };
-
-    init();
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    });
+    return unsub;
   }, []);
-
-  const getToken = async () => {
-    if (!auth.currentUser) return null;
-    const token = await auth.currentUser.getIdToken(false);
-    setJwtToken(token);
-    return token;
-  };
 
   const signUp = async (email, password, displayName) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -75,29 +43,18 @@ export function AuthProvider({ children }) {
     return cred.user;
   };
 
-  const signInWithGoogle = async () => {
-    try {
-      // Try popup first (works on localhost and most browsers)
-      const result = await signInWithPopup(auth, googleProvider);
-      return result.user;
-    } catch (err) {
-      if (
-        err.code === "auth/popup-blocked" ||
-        err.code === "auth/popup-closed-by-user" ||
-        err.code === "auth/cancelled-popup-request"
-      ) {
-        // Browser blocked popup — use redirect instead
-        await signInWithRedirect(auth, googleProvider);
-      } else {
-        throw err;
-      }
-    }
-  };
+  // ✅ Popup only — called directly from button click, no await before it
+  const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
 
   const signOut = async () => {
     await firebaseSignOut(auth);
     setJwtToken(null);
     localStorage.removeItem("mileexp_token");
+  };
+
+  const getToken = async () => {
+    if (!auth.currentUser) return null;
+    return auth.currentUser.getIdToken(false);
   };
 
   const tokenPayload = jwtToken
@@ -108,9 +65,7 @@ export function AuthProvider({ children }) {
     : null;
 
   return (
-    <AuthContext.Provider
-      value={{ user, jwtToken, tokenPayload, getToken, signUp, signIn, signInWithGoogle, signOut }}
-    >
+    <AuthContext.Provider value={{ user, jwtToken, tokenPayload, getToken, signUp, signIn, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
