@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Adjust if using Next.js
 import { useAuth } from "../context/AuthContext";
 
 const Spinner = () => (
@@ -21,21 +20,12 @@ function Label({ label, children }) {
 }
 
 export default function Login() {
-  const { signIn, signUp, signInWithGooglePopup, signInWithGoogleRedirect } = useAuth();
-  const navigate = useNavigate(); // For redirecting after success
-  
+  const { signIn,signUp,signInWithGooglePopup, signInWithGoogleRedirect } = useAuth();
   const [mode, setMode] = useState("signin");
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Cleans up the form when toggling modes
-  const handleModeSwitch = (newMode) => {
-    setMode(newMode);
-    setError("");
-    setForm({ name: "", email: "", password: "", confirm: "" });
-  };
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -45,13 +35,11 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
     if (mode === "signup") {
       if (!form.name.trim()) return setError("Display name is required.");
       if (form.password !== form.confirm) return setError("Passwords do not match.");
       if (form.password.length < 6) return setError("Password must be at least 6 characters.");
     }
-    
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -59,7 +47,6 @@ export default function Login() {
       } else {
         await signIn(form.email, form.password);
       }
-      navigate("/dashboard"); // 👈 Redirect on success!
     } catch (err) {
       const map = {
         "auth/user-not-found": "No account found with this email.",
@@ -76,30 +63,34 @@ export default function Login() {
     }
   };
 
-  const handleGoogle = async () => {
-    setGoogleLoading(true);
-    setError("");
+ const handleGoogle = async () => {
+  // 1. Start loading state
+  setGoogleLoading(true);
+  setError("");
+  
+  try {
+    // 2. Try the fast popup method first
+    await signInWithGooglePopup();
+    // navigate('/dashboard'); // Redirect to your app on success!
     
-    try {
-      // 1. Try the fast popup method
-      await signInWithGooglePopup();
-      navigate("/dashboard"); // 👈 Redirect on success!
+  } catch (err) {
+    if (err.code === "auth/popup-blocked") {
+      // 3. THE FALLBACK: If blocked, redirect the whole page
+      console.warn("Popup blocked. Falling back to redirect...");
+      await signInWithGoogleRedirect();
+      // Note: We DO NOT setGoogleLoading(false) here because the 
+      // browser is about to navigate away to Google's login page!
       
-    } catch (err) {
-      if (err.code === "auth/popup-blocked") {
-        // 2. Fallback to redirect if blocked by Vercel/Browser rules
-        console.warn("Popup blocked. Falling back to redirect...");
-        await signInWithGoogleRedirect();
-        // Notice we DO NOT stop loading here, because the page is about to navigate away
-      } else if (err.code !== "auth/popup-closed-by-user") {
-        setError(err.message);
-        setGoogleLoading(false);
-      } else {
-        setGoogleLoading(false); // User closed popup manually
-      }
+    } else if (err.code !== "auth/popup-closed-by-user") {
+      // Handle other real errors (like network issues)
+      setError(err.message);
+      setGoogleLoading(false);
+    } else {
+      // User manually closed the popup
+      setGoogleLoading(false);
     }
-  };
-
+  }
+};
   return (
     <div style={{
       position: "fixed",
@@ -167,7 +158,7 @@ export default function Login() {
           borderRadius: "10px", padding: "4px", marginBottom: "24px", gap: "4px",
         }}>
           {[["signin", "Sign In"], ["signup", "Create Account"]].map(([val, lbl]) => (
-            <button key={val} onClick={() => handleModeSwitch(val)} style={{
+            <button key={val} onClick={() => { setMode(val); setError(""); }} style={{
               flex: 1, padding: "10px 16px", borderRadius: "8px", border: "none",
               fontSize: "13.5px", fontWeight: mode === val ? 700 : 500,
               fontFamily: "inherit", cursor: "pointer", transition: "all 0.15s",
@@ -249,7 +240,7 @@ export default function Login() {
         </div>
 
         {/* Google */}
-        <button type="button" onClick={handleGoogle} disabled={googleLoading} style={{
+        <button onClick={handleGoogle} disabled={googleLoading} style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
           width: "100%", padding: "12px 20px", marginBottom: "20px",
           background: "#131324", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "12px",
