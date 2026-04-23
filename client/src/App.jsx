@@ -4,10 +4,12 @@ import CustomerTable from "./components/CustomerTable";
 import "./App.css";
 
 export default function App() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
   console.log("USER VALUE:", user);
 
-  if (user === undefined) {
+  // ⛔ Wait until Firebase resolves
+  if (loading) {
     return (
       <div className="splash">
         <div className="splash-ring" />
@@ -16,5 +18,6 @@ export default function App() {
     );
   }
 
+  // ✅ After loading is DONE
   return user ? <CustomerTable /> : <Login />;
 }
