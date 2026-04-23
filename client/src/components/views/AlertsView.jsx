@@ -1,8 +1,27 @@
 /* ─── AlertsView ─────────────────────────────────────────
    Flagged customers and system notifications.
-   Props: customers
+   Updated to dynamically fetch low-amount accounts!
 ─────────────────────────────────────────────────────── */
+import { useEffect, useState } from "react";
+import { getLowAmountAccounts } from "../../services/api";
+
 export default function AlertsView({ customers }) {
+  const [lowAccounts, setLowAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 🔥 Dynamically fetch the accounts with transactions < 5000
+  useEffect(() => {
+    getLowAmountAccounts()
+      .then((res) => {
+        setLowAccounts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch low amount accounts:", err);
+        setLoading(false);
+      });
+  }, []);
+
   const noActiveTier = customers.filter((c) => {
     const tiers = Object.values(c.tier_and_details || {});
     return !tiers.some((t) => t.active);
@@ -19,7 +38,7 @@ export default function AlertsView({ customers }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
 
-        {/* Low transaction banner */}
+        {/* 🔥 DYNAMIC Low transaction banner 🔥 */}
         <div style={{
           background: "rgba(244,63,94,0.08)",
           border: "1px solid rgba(244,63,94,0.25)",
@@ -27,14 +46,37 @@ export default function AlertsView({ customers }) {
           display: "flex", gap: "14px", alignItems: "flex-start",
         }}>
           <span style={{ fontSize: "20px", flexShrink: 0 }}>⚑</span>
-          <div>
+          <div style={{ width: "100%" }}>
             <div style={{ fontWeight: 700, fontSize: "14px", color: "var(--red)", marginBottom: "4px" }}>
               Low-Amount Transaction Monitor
             </div>
-            <div style={{ fontSize: "13px", color: "var(--text2)" }}>
-              Transactions below $5,000 are flagged in red in the Transaction History modal.
-              Click any account ID in the Customers view to inspect.
+            <div style={{ fontSize: "13px", color: "var(--text2)", marginBottom: "12px" }}>
+              The following account IDs have triggered alerts for transactions below $5,000:
             </div>
+            
+            {loading ? (
+              <div style={{ fontSize: "12px", color: "var(--red)", opacity: 0.8 }}>
+                Scanning network for flagged transactions...
+              </div>
+            ) : lowAccounts.length === 0 ? (
+              <div style={{ fontSize: "12px", color: "var(--green)", fontWeight: 600 }}>
+                No flagged transactions found.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {lowAccounts.map((acc) => (
+                  <span key={acc.account_id} style={{
+                    fontSize: "12px", fontWeight: 700, fontFamily: "monospace",
+                    padding: "4px 10px", borderRadius: "6px",
+                    background: "rgba(244,63,94,0.15)", color: "var(--red)",
+                    border: "1px solid rgba(244,63,94,0.3)",
+                    boxShadow: "0 2px 8px rgba(244,63,94,0.1)"
+                  }}>
+                    #{acc.account_id}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

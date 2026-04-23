@@ -1,64 +1,46 @@
 import express from "express";
-import Transaction from "../models/Transaction.js";
-import { verifyToken } from "../middleware/auth.js";
+import mongoose from "mongoose";
+import { verifyToken } from "../middleware/auth";
 
 const router = express.Router();
 
-// GET /api/transactions/account/:account_id
-// Returns all transactions for a given account_id
-router.get("/account/:account_id", verifyToken, async (req, res) => {
-  try {
-    const account_id = parseInt(req.params.account_id);
-    const bucket = await Transaction.findOne({ account_id }).lean();
-    if (!bucket) return res.json({ account_id, transactions: [], transaction_count: 0 });
-    res.json(bucket);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// Define flexible schema
+const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", new mongoose.Schema({}, { strict: false }), "transactions");
 
-// GET /api/transactions/low-amount
-// Task 3: Account IDs that have made at least one transaction below amount 5000
-router.get("/low-amount", verifyToken, async (req, res) => {
+// GET /api/transactions/low-amount --> (Assessment Question: Transactions below 5000)
+router.get("/low-amount", verifyToken,async (req, res) => {
   try {
     const threshold = parseInt(req.query.threshold) || 5000;
 
-    const result = await Transaction.aggregate([
-      // Unwind the nested transactions array
+    // Mongo query to list down account IDs which has made at least one transaction below 5000
+    const accounts = await Transaction.aggregate([
       { $unwind: "$transactions" },
-      // Keep only docs where the individual transaction amount < threshold
       { $match: { "transactions.amount": { $lt: threshold } } },
-      // Group by account_id to deduplicate
       { $group: { _id: "$account_id" } },
-      // Sort ascending
       { $sort: { _id: 1 } },
-      // Rename _id → account_id
-      { $project: { _id: 0, account_id: "$_id" } },
+      { $project: { _id: 0, account_id: "$_id" } }
     ]);
 
-    res.json({
-      threshold,
-      count: result.length,
-      account_ids: result.map((r) => r.account_id),
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json(accounts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// GET /api/transactions/stats
-router.get("/stats", verifyToken, async (req, res) => {
+// GET /api/transactions/account/:account_id
+router.get("/account/:account_id", verifyToken, async (req, res) => {
   try {
-    const [totalBuckets, totalTxns] = await Promise.all([
-      Transaction.countDocuments(),
-      Transaction.aggregate([{ $group: { _id: null, total: { $sum: "$transaction_count" } } }]),
-    ]);
-    res.json({
-      buckets: totalBuckets,
-      total_transactions: totalTxns[0]?.total || 0,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const accountId = parseInt(req.params.account_id);
+    
+    const transactionData = await Transaction.findOne({ account_id: accountId });
+    
+    if (!transactionData) {
+      return res.json({ account_id: accountId, transactions: [] });
+    }
+
+    res.json(transactionData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
