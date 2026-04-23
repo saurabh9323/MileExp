@@ -1,12 +1,10 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   onAuthStateChanged,
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
@@ -14,46 +12,37 @@ import { auth, googleProvider } from "../firebase";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(undefined); // undefined = still loading
+  const [user, setUser] = useState(undefined); // undefined = loading
   const [jwtToken, setJwtToken] = useState(null);
 
   useEffect(() => {
-    // 1. Process any pending redirect result FIRST, before subscribing to
-    //    onAuthStateChanged. This ensures the user is fully signed in by the
-    //    time the auth state listener fires on page load after a redirect.
-    getRedirectResult(auth)
-      .then((result) => {
-        // result is null if there's no pending redirect — that's fine.
-        // If result.user exists, onAuthStateChanged will also fire with the
-        // same user, so no need to call setUser here.
-        if (result?.user) {
-          console.log("Redirect sign-in complete:", result.user.email);
-        }
-      })
-      .catch((err) => {
-        console.error("getRedirectResult error:", err.code, err.message);
-      });
-
-    // 2. Subscribe to auth state — this is the single source of truth for
-    //    whether the user is logged in or not.
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u) {
+        // Get Firebase ID token (this IS our JWT — signed by Firebase)
         const token = await u.getIdToken();
         setJwtToken(token);
+        // Store token with user info payload for use throughout app
         localStorage.setItem("mileexp_token", token);
-        setUser(u);
       } else {
         setJwtToken(null);
         localStorage.removeItem("mileexp_token");
-        setUser(null);
       }
+      setUser(u || null);
     });
-
     return unsub;
   }, []);
 
+  // Refresh token helper (Firebase tokens expire after 1h)
+  const getToken = async () => {
+    if (!auth.currentUser) return null;
+    const token = await auth.currentUser.getIdToken(false); // false = use cached if valid
+    setJwtToken(token);
+    return token;
+  };
+
   const signUp = async (email, password, displayName) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
+    // Set display name on the Firebase user profile
     await updateProfile(cred.user, { displayName });
     return cred.user;
   };
@@ -63,10 +52,10 @@ export function AuthProvider({ children }) {
     return cred.user;
   };
 
-  // Triggers full-page redirect to Google — page navigates away immediately.
-  // After Google auth, browser returns to this app and getRedirectResult above
-  // processes the result, then onAuthStateChanged fires with the signed-in user.
-  const signInWithGoogle = () => signInWithRedirect(auth, googleProvider);
+  const signInWithGoogle = async () => {
+    const cred = await signInWithPopup(auth, googleProvider);
+    return cred.user;
+  };
 
   const signOut = async () => {
     await firebaseSignOut(auth);
@@ -74,15 +63,14 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("mileexp_token");
   };
 
-  const getToken = async () => {
-    if (!auth.currentUser) return null;
-    return auth.currentUser.getIdToken(false);
-  };
-
+  // Decoded token payload (name, email, uid etc.) — Firebase tokens are JWTs
   const tokenPayload = jwtToken
     ? (() => {
-        try { return JSON.parse(atob(jwtToken.split(".")[1])); }
-        catch { return null; }
+        try {
+          return JSON.parse(atob(jwtToken.split(".")[1]));
+        } catch {
+          return null;
+        }
       })()
     : null;
 
@@ -95,4 +83,5 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
