@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithRedirect,
+  signInWithPopup,
   getRedirectResult,
   updateProfile,
 } from "firebase/auth";
@@ -18,9 +19,19 @@ export function AuthProvider({ children }) {
   const [jwtToken, setJwtToken] = useState(null);
 
   useEffect(() => {
-    // Handle redirect result when user comes back from Google
-    getRedirectResult(auth).catch(() => {});
+    // ✅ Handle redirect result FIRST before setting up auth state listener
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          // User came back from Google redirect — onAuthStateChanged will fire
+          console.log("Redirect result user:", result.user.email);
+        }
+      })
+      .catch((err) => {
+        console.error("Redirect error:", err.code);
+      });
 
+    // Auth state listener — fires on login, logout, and after redirect
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u) {
         const token = await u.getIdToken();
@@ -32,6 +43,7 @@ export function AuthProvider({ children }) {
       }
       setUser(u || null);
     });
+
     return unsub;
   }, []);
 
@@ -53,8 +65,23 @@ export function AuthProvider({ children }) {
     return cred.user;
   };
 
-  // ✅ Use redirect — never blocked by browsers unlike popup
-  const signInWithGoogle = () => signInWithRedirect(auth, googleProvider);
+  // Try popup first, fall back to redirect if blocked
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      return result.user;
+    } catch (err) {
+      if (
+        err.code === "auth/popup-blocked" ||
+        err.code === "auth/popup-closed-by-user" ||
+        err.code === "auth/cancelled-popup-request"
+      ) {
+        // Fall back to redirect
+        return signInWithRedirect(auth, googleProvider);
+      }
+      throw err;
+    }
+  };
 
   const signOut = async () => {
     await firebaseSignOut(auth);
