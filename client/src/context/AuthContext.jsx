@@ -17,24 +17,25 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); // undefined = loading, null = logged out
   const [jwtToken, setJwtToken] = useState(null);
+useEffect(() => {
+  let isMounted = true;
 
-  useEffect(() => {
-    // ✅ Handle redirect ONCE on app load
-    const handleRedirect = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
-          console.log("Redirect login success:", result.user);
-        } await getRedirectResult(auth);
-      } catch (err) {
-        console.log("Redirect error:", err);
+  const initAuth = async () => {
+    try {
+      // 🔥 Capture redirect result FIRST
+      const result = await getRedirectResult(auth);
+
+      if (result?.user) {
+        console.log("Redirect login success:", result.user);
       }
-    };
+    } catch (err) {
+      console.error("Redirect error:", err);
+    }
 
-    handleRedirect();
-
-    // ✅ Then listen to auth state
+    // 🔥 THEN listen to auth state
     const unsub = onAuthStateChanged(auth, async (u) => {
+      if (!isMounted) return;
+
       if (u) {
         const token = await u.getIdToken();
         setJwtToken(token);
@@ -43,11 +44,20 @@ export function AuthProvider({ children }) {
         setJwtToken(null);
         localStorage.removeItem("mileexp_token");
       }
+
       setUser(u || null);
     });
 
     return unsub;
-  }, []);
+  };
+
+  const unsubscribePromise = initAuth();
+
+  return () => {
+    isMounted = false;
+    unsubscribePromise.then((unsub) => unsub && unsub());
+  };
+}, []);
 
 
 

@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,5 +11,17 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// ✅ FIRST create auth
 export const auth = getAuth(app);
+
+// ✅ THEN set persistence
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Persistence set");
+  })
+  .catch((err) => {
+    console.error("Persistence error:", err);
+  });
+
 export const googleProvider = new GoogleAuthProvider();
