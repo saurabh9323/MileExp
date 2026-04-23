@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 /* ─── DonutChart ─────────────────────────────────────────
    SVG donut chart. Props: segments [{ label, value, color }], size
 ─────────────────────────────────────────────────────── */

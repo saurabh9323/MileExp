@@ -42,8 +42,6 @@ export function AuthProvider({ children }) {
   const signIn = (email, password) =>
     signInWithEmailAndPassword(auth, email, password);
 
-  // signInWithPopup MUST be called synchronously from a click handler.
-  // No await, no setState, no anything before this in the call chain.
   const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
 
   const signOut = async () => {
