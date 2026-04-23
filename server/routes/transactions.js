@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import { verifyToken } from "../middleware/auth";
+import { verifyToken } from "../middleware/auth.js"
 
 const router = express.Router();
 
@@ -8,11 +8,12 @@ const router = express.Router();
 const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", new mongoose.Schema({}, { strict: false }), "transactions");
 
 // GET /api/transactions/low-amount --> (Assessment Question: Transactions below 5000)
+// routes/transactions.js
 router.get("/low-amount", verifyToken,async (req, res) => {
   try {
     const threshold = parseInt(req.query.threshold) || 5000;
 
-    // Mongo query to list down account IDs which has made at least one transaction below 5000
+    // The exact Mongo Query requested:
     const accounts = await Transaction.aggregate([
       { $unwind: "$transactions" },
       { $match: { "transactions.amount": { $lt: threshold } } },
@@ -26,7 +27,6 @@ router.get("/low-amount", verifyToken,async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // GET /api/transactions/account/:account_id
 router.get("/account/:account_id", verifyToken, async (req, res) => {
   try {

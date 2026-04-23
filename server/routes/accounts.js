@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import { verifyToken } from "../middleware/auth";
+import { verifyToken } from "../middleware/auth.js"
 
 const router = express.Router();
 
