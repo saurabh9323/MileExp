@@ -5,7 +5,8 @@ import {
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
@@ -17,6 +18,16 @@ export function AuthProvider({ children }) {
   const [jwtToken, setJwtToken] = useState(null);
 
   useEffect(() => {
+    // Handle the redirect result when the user lands back on the app.
+    // getRedirectResult resolves to null if there's no pending redirect —
+    // so this is safe to call on every mount.
+    getRedirectResult(auth).catch((err) => {
+      // Swallow "popup closed" or "cancelled" errors that can surface here;
+      // real errors (e.g. account-exists-with-different-credential) should be
+      // surfaced to the user — re-throw or handle as needed.
+      console.error("Redirect result error:", err);
+    });
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u) {
         const token = await u.getIdToken();
@@ -29,6 +40,7 @@ export function AuthProvider({ children }) {
         setUser(null);
       }
     });
+
     return unsub;
   }, []);
 
@@ -43,8 +55,11 @@ export function AuthProvider({ children }) {
     return cred.user;
   };
 
-  // ✅ Popup only — called directly from button click, no await before it
-  const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+  // Triggers a full-page redirect to Google's OAuth screen.
+  // Must be called synchronously inside a user-gesture handler (onClick).
+  // The app will remount after the redirect; onAuthStateChanged picks up the
+  // signed-in user automatically — no extra handling needed in Login.jsx.
+  const signInWithGoogle = () => signInWithRedirect(auth, googleProvider);
 
   const signOut = async () => {
     await firebaseSignOut(auth);
@@ -65,7 +80,9 @@ export function AuthProvider({ children }) {
     : null;
 
   return (
-    <AuthContext.Provider value={{ user, jwtToken, tokenPayload, getToken, signUp, signIn, signInWithGoogle, signOut }}>
+    <AuthContext.Provider
+      value={{ user, jwtToken, tokenPayload, getToken, signUp, signIn, signInWithGoogle, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

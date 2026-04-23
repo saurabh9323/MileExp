@@ -63,24 +63,22 @@ export default function Login() {
     }
   };
 
-  // ✅ CRITICAL: No async/await before signInWithGoogle()
-  // Popup must be triggered synchronously from click event
-  // Any await before signInWithPopup causes browsers to block it
+  // signInWithRedirect navigates the page away — it never resolves/rejects
+  // in the current page context, so no .then()/.catch() needed.
+  // Just show a loading spinner and let the browser navigate.
   const handleGoogle = () => {
     setError("");
     setGoogleLoading(true);
-    signInWithGoogle()
-      .then(() => {
-        // onAuthStateChanged in AuthContext handles the rest
-      })
-      .catch((err) => {
-        if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
-          setError(err.message);
-        }
-      })
-      .finally(() => {
-        setGoogleLoading(false);
-      });
+    // If signInWithRedirect throws synchronously (misconfigured provider etc.)
+    // catch it and show the error. Otherwise the page navigates away.
+    try {
+      signInWithGoogle();
+      // No .then() — the page is about to navigate away.
+      // googleLoading stays true until navigation completes (intentional).
+    } catch (err) {
+      setError(err.message);
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -215,7 +213,6 @@ export default function Login() {
           <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.08)" }} />
         </div>
 
-        {/* ✅ onClick is NOT async — calls handleGoogle directly */}
         <button
           onClick={handleGoogle}
           disabled={googleLoading}
@@ -236,7 +233,7 @@ export default function Login() {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
           )}
-          {googleLoading ? "Connecting…" : "Continue with Google"}
+          {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
         </button>
 
         <p style={{ fontSize: "12px", color: "#4a4a70", textAlign: "center", lineHeight: 1.6 }}>
