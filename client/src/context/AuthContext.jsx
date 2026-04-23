@@ -8,7 +8,7 @@ import {
   signInWithRedirect,
   updateProfile,
   getIdToken,
-  getRedirectResult 
+  getRedirectResult
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 
@@ -19,18 +19,22 @@ export function AuthProvider({ children }) {
   const [jwtToken, setJwtToken] = useState(null);
 
   useEffect(() => {
-    // Listen for auth state changes (catches both normal logins and redirects!)
+    // ✅ Handle redirect ONCE on app load
+    const handleRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          console.log("Redirect login success:", result.user);
+        } await getRedirectResult(auth);
+      } catch (err) {
+        console.log("Redirect error:", err);
+      }
+    };
+
+    handleRedirect();
+
+    // ✅ Then listen to auth state
     const unsub = onAuthStateChanged(auth, async (u) => {
-
-        const checkRedirect = async () => {
-    try {
-      await getRedirectResult(auth);
-    } catch (err) {
-      console.log("Redirect error:", err);
-    }
-  };
-
-  checkRedirect();
       if (u) {
         const token = await u.getIdToken();
         setJwtToken(token);
@@ -42,22 +46,10 @@ export function AuthProvider({ children }) {
       setUser(u || null);
     });
 
-    // Refresh token every 50 mins
-    const handle = setInterval(async () => {
-      if (auth.currentUser) {
-        const token = await auth.currentUser.getIdToken(true);
-        setJwtToken(token);
-        localStorage.setItem("mileexp_token", token);
-      }
-    }, 1000 * 60 * 50);
-
-    return () => {
-      unsub();
-      clearInterval(handle);
-    };
+    return unsub;
   }, []);
 
-  
+
 
   const getToken = async (forceRefresh = false) => {
     if (!auth.currentUser) return null;
@@ -74,7 +66,7 @@ export function AuthProvider({ children }) {
   };
 
   const signIn = (email, password) => signInWithEmailAndPassword(auth, email, password);
-  
+
   // Expose BOTH Google methods
   const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
   const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
