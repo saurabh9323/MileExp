@@ -69,11 +69,7 @@ export default function Login() {
     try {
       await signInWithGoogle();
     } catch (err) {
-     if (err.code === "auth/popup-blocked") {
-  setError("Popup blocked. Please allow popups or try again.");
-} else if (err.code !== "auth/popup-closed-by-user") {
-  setError(err.message);
-}
+      if (err.code !== "auth/popup-closed-by-user") setError(err.message);
     } finally {
       setGoogleLoading(false);
     }

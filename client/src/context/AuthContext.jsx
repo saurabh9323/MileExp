@@ -7,7 +7,7 @@ import {
   signInWithPopup,
   updateProfile,
 } from "firebase/auth";
-import { auth, googleProvider,signInWithRedirect  } from "../firebase";
+import { auth, googleProvider } from "../firebase";
 
 const AuthContext = createContext(null);
 
@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
   };
 
   const signInWithGoogle = async () => {
-    const cred = await signInWithRedirect(auth, googleProvider);
+    const cred = await signInWithPopup(auth, googleProvider);
     return cred.user;
   };
 
