@@ -8,6 +8,7 @@ import {
   signInWithRedirect,
   updateProfile,
   getIdToken,
+  getRedirectResult 
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 
@@ -20,6 +21,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Listen for auth state changes (catches both normal logins and redirects!)
     const unsub = onAuthStateChanged(auth, async (u) => {
+
+        const checkRedirect = async () => {
+    try {
+      await getRedirectResult(auth);
+    } catch (err) {
+      console.log("Redirect error:", err);
+    }
+  };
+
+  checkRedirect();
       if (u) {
         const token = await u.getIdToken();
         setJwtToken(token);
@@ -45,6 +56,8 @@ export function AuthProvider({ children }) {
       clearInterval(handle);
     };
   }, []);
+
+  
 
   const getToken = async (forceRefresh = false) => {
     if (!auth.currentUser) return null;
