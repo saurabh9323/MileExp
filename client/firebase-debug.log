@@ -1,0 +1,57 @@
+[debug] [2026-04-24T06:01:09.108Z] ----------------------------------------------------------------------
+[debug] [2026-04-24T06:01:09.111Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\saurabh\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js init hosting
+[debug] [2026-04-24T06:01:09.112Z] CLI Version:   15.15.0
+[debug] [2026-04-24T06:01:09.112Z] Platform:      win32
+[debug] [2026-04-24T06:01:09.112Z] Node Version:  v22.21.1
+[debug] [2026-04-24T06:01:09.113Z] Time:          Fri Apr 24 2026 11:31:09 GMT+0530 (India Standard Time)
+[debug] [2026-04-24T06:01:09.113Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-24T06:01:09.116Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\mileexp-mern\client
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[debug] [2026-04-24T06:01:13.203Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-04-24T06:01:13.203Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-04-24T06:01:41.301Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-24T06:01:41.302Z] > authorizing via signed-in user (saurabh.pathak52@gmail.com)
+[debug] [2026-04-24T06:01:41.303Z] Checked if tokens are valid: false, expires at: 1776950849381
+[debug] [2026-04-24T06:01:41.303Z] Checked if tokens are valid: false, expires at: 1776950849381
+[debug] [2026-04-24T06:01:41.303Z] > refreshing access token with scopes: []
+[debug] [2026-04-24T06:01:41.304Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-04-24T06:01:41.304Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-24T06:01:41.434Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-04-24T06:01:41.434Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-24T06:01:41.446Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/mileexp-b1bac [none]
+[debug] [2026-04-24T06:01:41.836Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/mileexp-b1bac 200
+[debug] [2026-04-24T06:01:41.836Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/mileexp-b1bac {"projectId":"mileexp-b1bac","projectNumber":"322832743514","displayName":"MileExp","name":"projects/mileexp-b1bac","resources":{"hostingSite":"mileexp-b1bac"},"state":"ACTIVE","etag":"1_5ee38d9f-d76c-45d1-a7d3-612fd424e0e3"}
+[info] i  Using project mileexp-b1bac (MileExp) . 
+[info] 
+=== Hosting Setup
+[debug] [2026-04-24T06:02:04.279Z] Checked if tokens are valid: true, expires at: 1777014100434
+[debug] [2026-04-24T06:02:04.279Z] Checked if tokens are valid: true, expires at: 1777014100434
+[debug] [2026-04-24T06:02:04.279Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/mileexp-b1bac [none]
+[debug] [2026-04-24T06:02:04.660Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/mileexp-b1bac 200
+[debug] [2026-04-24T06:02:04.660Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/mileexp-b1bac {"projectId":"mileexp-b1bac","projectNumber":"322832743514","displayName":"MileExp","name":"projects/mileexp-b1bac","resources":{"hostingSite":"mileexp-b1bac"},"state":"ACTIVE","etag":"1_5ee38d9f-d76c-45d1-a7d3-612fd424e0e3"}
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 
