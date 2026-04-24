@@ -8,11 +8,13 @@
     "seed": "node scripts/seedData.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "firebase-admin": "^12.1.0",
     "firebase-tools": "^15.15.0",
+    "jsonwebtoken": "^9.0.3",
     "mileexp-mern": "file:..",
     "mongoose": "^8.4.1"
   },
