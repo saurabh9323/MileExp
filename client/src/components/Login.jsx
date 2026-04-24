@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const Spinner = () => (
-  <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+  <svg style={{ width: "16px", height: "16px", flexShrink: 0, animation: "spin 0.7s linear infinite" }}
+    fill="none" viewBox="0 0 24 24">
+    <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+    <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
   </svg>
 );
 
@@ -61,9 +62,7 @@ export default function Login() {
     }
   };
 
-  // ✅ NOT async. Zero code runs before signInWithGoogle().
-  // setError/setGoogleLoading happen AFTER in .then()/.catch() —
-  // those run after the popup is already open, so they don't block it.
+  // ✅ NOT async — signInWithGoogle() fires immediately on click
   const handleGoogle = () => {
     setGoogleLoading(true);
     setError("");
@@ -98,6 +97,7 @@ export default function Login() {
         background: "radial-gradient(ellipse at top, rgba(233,69,96,0.18) 0%, transparent 65%)",
       }} />
 
+      {/* Card */}
       <div style={{
         position: "relative", zIndex: 10, width: "100%", maxWidth: "460px",
         background: "linear-gradient(135deg, rgba(19,19,36,0.97), rgba(13,13,26,0.99))",
@@ -106,6 +106,8 @@ export default function Login() {
         boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.7)",
         animation: "fadeUp 0.45s cubic-bezier(.22,1,.36,1)",
       }}>
+
+        {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
           <div style={{
             width: "44px", height: "44px", borderRadius: "12px", flexShrink: 0,
@@ -124,6 +126,7 @@ export default function Login() {
           </div>
         </div>
 
+        {/* Mode tabs */}
         <div style={{
           display: "flex", background: "#131324",
           border: "1px solid rgba(255,255,255,0.06)",
@@ -198,7 +201,6 @@ export default function Login() {
           <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.08)" }} />
         </div>
 
-        {/* onClick is NOT async — signInWithGoogle() is the very first thing called */}
         <button onClick={handleGoogle} disabled={googleLoading} style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
           width: "100%", padding: "12px 20px", marginBottom: "20px",
